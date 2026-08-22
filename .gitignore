@@ -1,0 +1,37 @@
+# WHMCS Synapse Addon - Git Ignore
+
+# Composer
+vendor/
+composer.lock
+
+# IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Logs
+*.log
+logs/
+
+# Configuration
+config.local.php
+
+# Test Files
+phpunit.xml
+.phpunit.result.cache
+tests/_output/
+
+# Build Files
+build/
+dist/
+
+# Backup Files
+*.bak
+*.backup

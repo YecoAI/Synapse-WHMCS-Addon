@@ -1,0 +1,43 @@
+{
+    "name": "synapse/whmcs-addon",
+    "description": "Enterprise AI automation addon for WHMCS hosting providers",
+    "type": "whmcs-addon",
+    "version": "0.9.0",
+    "license": "proprietary",
+    "homepage": "https://synapse.yecoai.com",
+    "support": {
+        "docs": "https://synapse.yecoai.com/docs/",
+        "email": "support@synapse.yecoai.com",
+        "issues": "https://support.synapse.yecoai.com"
+    },
+    "authors": [
+        {
+            "name": "YecoAI",
+            "email": "support@synapse.yecoai.com",
+            "homepage": "https://synapse.yecoai.com",
+            "role": "Publisher"
+        }
+    ],
+    "keywords": [
+        "whmcs",
+        "automation",
+        "ai",
+        "hosting",
+        "support",
+        "tickets",
+        "proxmox",
+        "virtfusion"
+    ],
+    "require": {
+        "php": ">=8.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-openssl": "*"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

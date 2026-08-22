@@ -1,0 +1,72 @@
+Synapse AI Autopilot — WHMCS Addon
+Copyright (c) 2023–2026 YecoAI. All rights reserved.
+
+PROPRIETARY SOFTWARE LICENSE
+
+This software and associated documentation (the "Software") are the exclusive
+property of YecoAI and are protected by copyright, trade secret, and other
+applicable intellectual property laws.
+
+1. GRANT OF LICENSE
+
+Subject to a valid Synapse Control Panel license and compliance with this
+Agreement, YecoAI grants you a limited, non-exclusive, non-transferable license
+to install and use the Software solely in connection with WHMCS installations
+you operate or manage under an authorized Synapse license.
+
+2. PERMITTED USE
+
+You may:
+
+- install the Software in WHMCS environments covered by your Synapse license
+- configure and operate the Software for customer support automation
+- apply updates distributed by YecoAI through official channels
+
+3. RESTRICTIONS
+
+You may not, without prior written authorization from YecoAI:
+
+- redistribute, sublicense, sell, lease, or publish the Software
+- remove proprietary notices or misrepresent ownership
+- reverse engineer, decompile, or attempt to derive source code except where
+  expressly permitted by applicable law
+- use the Software without an active Synapse license or outside licensed scope
+
+4. CONFIDENTIALITY
+
+The Software contains confidential and proprietary information of YecoAI.
+You agree to protect it with at least the same degree of care used for your
+own confidential materials and not to disclose it to unauthorized parties.
+
+5. SUPPORT AND DOCUMENTATION
+
+Official documentation, integration guidance, and operational best practices
+are available at https://synapse.yecoai.com/docs/
+
+Support is provided according to your Synapse service plan through
+https://support.synapse.yecoai.com or support@synapse.yecoai.com.
+
+6. WARRANTY DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS
+OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, AND NON-INFRINGEMENT.
+
+7. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, YECOAI SHALL NOT BE LIABLE FOR ANY
+INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR ANY
+LOSS OF PROFITS, DATA, OR BUSINESS INTERRUPTION, ARISING FROM OR RELATED TO
+USE OF THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+8. TERMINATION
+
+This license terminates automatically upon expiration or revocation of your
+Synapse license or upon material breach of these terms. Upon termination, you
+must cease use of the Software and remove installed copies unless retention is
+required by law.
+
+9. GOVERNING CONTACT
+
+Licensing inquiries: licensing@synapse.yecoai.com
+General support: support@synapse.yecoai.com
