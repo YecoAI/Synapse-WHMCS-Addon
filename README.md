@@ -9,7 +9,7 @@ Enterprise AI automation for hosting providers running WHMCS. Synapse ingests su
 Synapse AI Autopilot connects WHMCS to the Synapse Control Panel and delivers:
 
 - AI-assisted ticket resolution with planner and verifier models
-- Department-level automation modes: Observe, Copilot, and Autopilot
+- Department-level automation modes: Copilot and Autopilot
 - Infrastructure-aware context for VPS and dedicated services
 - Signed webhook communication and encrypted sensitive payloads
 - Operator dashboards, diagnostics, and immutable activity logging
@@ -30,7 +30,7 @@ Synapse AI Autopilot connects WHMCS to the Synapse Control Panel and delivers:
 Extract the release package and copy the addon into WHMCS:
 
 ```bash
-unzip synapse-whmcs-addon-0.9.0.zip
+unzip synapse-whmcs-addon-0.9.1.zip
 cp -r synapse/ /path/to/whmcs/modules/addons/
 ```
 
@@ -78,8 +78,8 @@ After installation, open **Addons → Synapse AI Autopilot**. The dashboard chec
 | Channel | Link |
 |---|---|
 | Documentation | [synapse.yecoai.com/docs](https://synapse.yecoai.com/docs/) |
-| Support portal | [support.synapse.yecoai.com](https://support.synapse.yecoai.com) |
-| Email | support@synapse.yecoai.com |
+| Support portal | [synapse.yecoai.com](https://synapse.yecoai.com) |
+| Email | support@yecoai.com |
 
 Enterprise support is available for Business and Enterprise plans.
 

@@ -136,8 +136,8 @@ $stats = [
                 <?php foreach ($tickets as $ticket): ?>
                     <tr>
                         <td>
-                            <a href="supporttickets.php?action=view&id=<?php echo $ticket->whmcs_ticket_id; ?>" target="_blank">
-                                #<?php echo $ticket->whmcs_ticket_id; ?>
+                            <a href="supporttickets.php?action=view&id=<?php echo (int) $ticket->whmcs_ticket_id; ?>" target="_blank">
+                                #<?php echo (int) $ticket->whmcs_ticket_id; ?>
                             </a>
                         </td>
                         <td>

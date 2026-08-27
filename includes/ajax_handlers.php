@@ -6,6 +6,8 @@ if (!defined('WHMCS')) {
     die('Access denied');
 }
 
+require_once __DIR__ . '/synapse_shared.php';
+
 function synapseRequireAdmin()
 {
     $adminId = 0;
@@ -184,7 +186,7 @@ function synapseAjaxDepartmentStats()
         $stats[] = [
             'id' => $dept->id,
             'name' => $dept->name,
-            'ai_mode' => $synapse_config->ai_mode ?? 'observe',
+            'ai_mode' => ($synapse_config->ai_mode ?? 'copilot') === 'observe' ? 'copilot' : ($synapse_config->ai_mode ?? 'copilot'),
             'enabled' => $synapse_config->enabled ?? 0,
             'processed_tickets' => $ticket_count,
         ];

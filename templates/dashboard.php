@@ -84,7 +84,7 @@ $cp_url = 'https://synapsecp.yecoai.com';
 <?php if ($backend_config): ?>
     <div class="alert alert-info">
         Mode: <span class="synapse-status status-<?php echo $backend_config['hypervisorConnected'] ? 'healthy' : 'warning'; ?>">
-            <?php echo strtoupper($backend_config['mode']); ?>
+            <?php echo htmlspecialchars(strtoupper((string) $backend_config['mode'])); ?>
         </span> |
         Hypervisor: <span class="synapse-status status-<?php echo $backend_config['hypervisorConnected'] ? 'healthy' : 'error'; ?>">
             <?php echo $backend_config['hypervisorConnected'] ? 'CONNECTED' : 'DISCONNECTED'; ?>

@@ -24,7 +24,7 @@ $cp_url = 'https://synapsecp.yecoai.com';
     
     <div style="float: right;">
         <span style="color: #666; font-size: 12px;">
-            Synapse AI Autopilot v<?php echo defined('SYNAPSE_ADDON_VERSION') ? htmlspecialchars(SYNAPSE_ADDON_VERSION) : '0.9.0'; ?> | 
+            Synapse AI Autopilot v<?php echo defined('SYNAPSE_ADDON_VERSION') ? htmlspecialchars(SYNAPSE_ADDON_VERSION) : '0.9.1'; ?> | 
             License: <?php echo htmlspecialchars(substr($license_key, 0, 8) . '...'); ?>
         </span>
     </div>

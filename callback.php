@@ -4,52 +4,12 @@ require_once '../../../init.php';
 require_once '../../../includes/functions.php';
 require_once __DIR__ . '/includes/version.php';
 require_once __DIR__ . '/includes/SynapseHmac.php';
+require_once __DIR__ . '/includes/synapse_shared.php';
 
 use WHMCS\Database\Capsule;
 
 if (!defined("WHMCS")) {
     die("Access denied");
-}
-
-function synapseLog($message, $level = 'INFO') {
-    $settings = getSynapseSettings();
-    if ($settings['debug_mode'] === 'on') {
-        logActivity("[Synapse {$level}] {$message}");
-    }
-}
-
-function synapsePlainLicenseKey($raw) {
-    $key = trim((string) $raw);
-    if ($key === '') {
-        return '';
-    }
-    if (stripos($key, 'SYN-') === 0) {
-        return $key;
-    }
-    if (function_exists('decrypt')) {
-        $dec = decrypt($key);
-        if (is_string($dec) && stripos(trim($dec), 'SYN-') === 0) {
-            return trim($dec);
-        }
-    }
-    return $key;
-}
-
-function synapseHmacKey() {
-    $settings = getSynapseSettings();
-    $license = synapsePlainLicenseKey($settings['license_key'] ?? '');
-    return synapseHmacKeyFrom($license);
-}
-
-function getSynapseSettings() {
-    static $settings = null;
-    if ($settings === null) {
-        $result = Capsule::table('tbladdonmodules')
-            ->where('module', 'synapse')
-            ->pluck('value', 'setting');
-        $settings = $result;
-    }
-    return $settings;
 }
 
 function validateSignature($body, $signature, $timestamp, $nonce) {
@@ -124,9 +84,6 @@ function validateIpWhitelist() {
 
     $allowed_ips = array_map('trim', explode(',', $whitelist));
     $client_ip = synapseClientIp();
-    if (in_array($client_ip, ['127.0.0.1', '::1', '::ffff:127.0.0.1'], true)) {
-        return true;
-    }
 
     if (in_array($client_ip, $allowed_ips, true)) {
         return true;
@@ -574,25 +531,50 @@ function handleOrderActivate($data) {
         throw new Exception('order.activate requires a dedicated callback secret');
     }
     $order_id = $data['order_id'] ?? null;
-    
+    $client_id = $data['client_id'] ?? null;
+
     if (!is_numeric($order_id)) {
         throw new Exception('Missing required field: order_id');
     }
     $order_id = (int)$order_id;
-    
-    synapseLog("Activating order {$order_id}");
-    
+
+    $order_result = synapseLocalAPI('GetOrders', ['id' => $order_id]);
+    if (($order_result['result'] ?? '') !== 'success') {
+        throw new Exception('Unable to look up order');
+    }
+    $orders = synapseNormalizeList($order_result['orders']['order'] ?? []);
+    if ($orders === []) {
+        throw new Exception('Order not found');
+    }
+    $order = $orders[0];
+    $order_user_id = (int) ($order['userid'] ?? 0);
+    if ($order_user_id < 1) {
+        throw new Exception('Order has no associated client');
+    }
+    if ($client_id !== null && is_numeric($client_id)) {
+        if ($order_user_id !== (int)$client_id) {
+            throw new Exception('Order does not belong to the specified client');
+        }
+    }
+    $order_status = strtolower(trim((string) ($order['status'] ?? '')));
+    if ($order_status !== '' && !in_array($order_status, ['pending', 'fraud'], true)) {
+        throw new Exception('Order is not in a pending state');
+    }
+
+    synapseLog("Activating order {$order_id} for client {$order_user_id}");
+
     $accept_result = synapseLocalAPI('AcceptOrder', ['orderid' => $order_id]);
-    
+
     if ($accept_result['result'] !== 'success') {
         throw new Exception("Failed to accept order: " . ($accept_result['message'] ?? 'Unknown error'));
     }
-    
+
     synapseLog("Order {$order_id} accepted and activated successfully");
-    
+
     return [
         'status' => 'success',
-        'order_id' => $order_id
+        'order_id' => $order_id,
+        'client_id' => $order_user_id,
     ];
 }
 

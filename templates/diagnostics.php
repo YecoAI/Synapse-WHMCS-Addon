@@ -151,7 +151,7 @@ if ($_POST && isset($_POST['run_diagnostics'])) {
             <div class="panel-body">
                 <ul>
                     <?php foreach ($test_results['php_extensions'] as $ext => $loaded): ?>
-                        <li><?php echo $ext; ?>: <strong><?php echo $loaded ? 'Loaded' : 'Missing'; ?></strong></li>
+                        <li><?php echo htmlspecialchars($ext); ?>: <strong><?php echo $loaded ? 'Loaded' : 'Missing'; ?></strong></li>
                     <?php endforeach; ?>
                 </ul>
             </div>
@@ -184,7 +184,7 @@ if ($_POST && isset($_POST['run_diagnostics'])) {
                         'timestamp' => date('c'),
                         'whmcs_version' => $test_results['whmcs_config']['version'] ?? 'unknown',
                         'php_version' => PHP_VERSION,
-                        'addon_version' => defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.0',
+                        'addon_version' => defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.1',
                         'test_results' => $test_results,
                         'server_info' => [
                             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',

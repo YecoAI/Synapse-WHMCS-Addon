@@ -6,11 +6,11 @@ if ($_POST && isset($_POST['save_departments'])) {
         if (function_exists('check_token')) {
             check_token('POST');
         }
-        $allowed_modes = ['observe', 'copilot', 'autopilot'];
+        $allowed_modes = ['copilot', 'autopilot'];
         foreach ($_POST['departments'] as $dept_id => $config) {
-            $mode = $config['mode'] ?? 'observe';
+            $mode = $config['mode'] ?? 'copilot';
             if (!in_array($mode, $allowed_modes, true)) {
-                $mode = 'observe';
+                $mode = 'copilot';
             }
             Capsule::table('synapse_config')->updateOrInsert(
                 ['department_id' => (int)$dept_id],
@@ -69,20 +69,23 @@ $synapse_enabled = Capsule::table('synapse_config')
             </thead>
             <tbody>
                 <?php foreach ($whmcs_departments as $dept): ?>
+                    <?php
+                    $current_mode = $synapse_config[$dept->id] ?? 'copilot';
+                    if ($current_mode === 'observe') {
+                        $current_mode = 'copilot';
+                    }
+                    ?>
                     <tr>
                         <td>
                             <strong><?php echo htmlspecialchars($dept->name); ?></strong>
-                            <input type="hidden" name="departments[<?php echo $dept->id; ?>][name]" value="<?php echo htmlspecialchars($dept->name); ?>">
+                            <input type="hidden" name="departments[<?php echo (int) $dept->id; ?>][name]" value="<?php echo htmlspecialchars($dept->name); ?>">
                         </td>
                         <td>
-                            <select name="departments[<?php echo $dept->id; ?>][mode]" class="form-control" style="width: 120px;">
-                                <option value="observe" <?php echo ($synapse_config[$dept->id] ?? 'observe') === 'observe' ? 'selected' : ''; ?>>
-                                    Observe
-                                </option>
-                                <option value="copilot" <?php echo ($synapse_config[$dept->id] ?? 'observe') === 'copilot' ? 'selected' : ''; ?>>
+                            <select name="departments[<?php echo (int) $dept->id; ?>][mode]" class="form-control" style="width: 120px;">
+                                <option value="copilot" <?php echo $current_mode === 'copilot' ? 'selected' : ''; ?>>
                                     Copilot
                                 </option>
-                                <option value="autopilot" <?php echo ($synapse_config[$dept->id] ?? 'observe') === 'autopilot' ? 'selected' : ''; ?>>
+                                <option value="autopilot" <?php echo $current_mode === 'autopilot' ? 'selected' : ''; ?>>
                                     Autopilot
                                 </option>
                             </select>
@@ -90,14 +93,14 @@ $synapse_enabled = Capsule::table('synapse_config')
                         <td>
                             <label>
                                 <input type="checkbox" 
-                                       name="departments[<?php echo $dept->id; ?>][enabled]" 
+                                       name="departments[<?php echo (int) $dept->id; ?>][enabled]" 
                                        value="1" 
                                        <?php echo ($synapse_enabled[$dept->id] ?? 0) ? 'checked' : ''; ?>>
                                 Enabled
                             </label>
                         </td>
                         <td style="font-size: 12px; color: #666;">
-                            <div id="mode-desc-<?php echo $dept->id; ?>"></div>
+                            <div id="mode-desc-<?php echo (int) $dept->id; ?>"></div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -107,7 +110,6 @@ $synapse_enabled = Capsule::table('synapse_config')
         <div class="alert alert-info" style="margin-top: 20px;">
             <h4>AI Mode Descriptions:</h4>
             <ul style="margin: 10px 0;">
-                <li><strong>Observe:</strong> AI analyzes tickets but takes no action. Provides insights only.</li>
                 <li><strong>Copilot:</strong> AI suggests actions that require human approval before execution.</li>
                 <li><strong>Autopilot:</strong> AI automatically executes safe actions (reboot, diagnostics, password reset).</li>
             </ul>
@@ -124,7 +126,6 @@ $synapse_enabled = Capsule::table('synapse_config')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const descriptions = {
-        observe: 'AI will analyze tickets and provide insights but will not take any actions.',
         copilot: 'AI will suggest actions that require human approval. Staff must review and approve before execution.',
         autopilot: 'AI will automatically execute safe actions like diagnostics, reboots, and password resets.'
     };

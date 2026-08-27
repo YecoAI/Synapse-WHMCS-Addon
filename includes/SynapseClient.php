@@ -3,6 +3,7 @@
 use WHMCS\Database\Capsule;
 
 require_once __DIR__ . '/version.php';
+require_once __DIR__ . '/synapse_shared.php';
 
 class SynapseClient
 {
@@ -10,7 +11,6 @@ class SynapseClient
     private $license_key;
     private $backend_url;
     private $debug_mode;
-    private const ENCRYPTION_PREFIX = 'synapse-encryption-v1::';
 
     public function __construct()
     {
@@ -19,63 +19,24 @@ class SynapseClient
 
     private function loadSettings()
     {
-        $this->settings = Capsule::table('tbladdonmodules')
-            ->where('module', 'synapse')
-            ->pluck('value', 'setting');
-
-        $rawKey = trim((string) ($this->settings['license_key'] ?? ''));
-        if ($rawKey !== '' && stripos($rawKey, 'SYN-') !== 0 && function_exists('decrypt')) {
-            $dec = decrypt($rawKey);
-            if (is_string($dec) && stripos(trim($dec), 'SYN-') === 0) {
-                $rawKey = trim($dec);
-            }
-        }
-        $this->license_key = $rawKey;
-        $this->backend_url = $this->normalizeBackendUrl($this->settings['backend_url'] ?? '');
-        $this->debug_mode = ($this->settings['debug_mode'] ?? '') === 'on';
+        $this->settings = getSynapseSettings();
+        $this->license_key = synapsePlainLicenseKey();
+        $this->backend_url = synapseBackendUrl();
+        $this->debug_mode = synapseDebugEnabled();
 
         if (empty($this->license_key) || empty($this->backend_url)) {
             throw new Exception('Synapse not configured - missing license key or backend URL');
         }
     }
 
-    private function normalizeBackendUrl($url)
-    {
-        $url = rtrim(trim((string) $url), '/');
-        if ($url === '') {
-            return '';
-        }
-        if (!preg_match('#/api/v1$#i', $url)) {
-            $url .= '/api/v1';
-        }
-        return $url;
-    }
-
     private function log($message, $level = 'INFO')
     {
-        if ($this->debug_mode) {
-            logActivity("[Synapse {$level}] {$message}");
-        }
+        synapseLog($message, $level);
     }
 
     private function encryptPayload($data)
     {
-        $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        
-        if (!extension_loaded('openssl')) {
-            throw new Exception('OpenSSL extension required for encryption');
-        }
-
-        $key = hash('sha256', self::ENCRYPTION_PREFIX . $this->license_key, true);
-        $nonce = random_bytes(12);
-        
-        $encrypted = openssl_encrypt($json, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $nonce, $tag);
-        
-        if ($encrypted === false) {
-            throw new Exception('Encryption failed');
-        }
-
-        return base64_encode($nonce . $encrypted . $tag);
+        return synapseEncryptPayload($data, $this->license_key);
     }
 
     private function makeRequest($endpoint, $data = null, $method = 'GET', $timeout = 30, $decode_json = true)
@@ -96,7 +57,7 @@ class SynapseClient
         $headers = [
             'Authorization: Bearer ' . $this->license_key,
             'Accept: application/json',
-            'User-Agent: WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.0'),
+            'User-Agent: WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.1'),
             'X-Synapse-WHMCS-URL: ' . rtrim($whmcsUrl, '/')
         ];
         if ($decode_json) {
@@ -112,7 +73,7 @@ class SynapseClient
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_USERAGENT => 'WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.0')
+            CURLOPT_USERAGENT => 'WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.1')
         ]);
 
         if ($method === 'POST' && $data !== null) {
@@ -316,12 +277,12 @@ class SynapseClient
             CURLOPT_HTTPHEADER => [
                 'Authorization: Bearer ' . $this->license_key,
                 'Accept: application/octet-stream',
-                'User-Agent: WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.0'),
+                'User-Agent: WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.1'),
                 'X-Synapse-WHMCS-URL: ' . rtrim($whmcsUrl, '/'),
             ],
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_USERAGENT => 'WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.0'),
+            CURLOPT_USERAGENT => 'WHMCS-Synapse/' . (defined('SYNAPSE_ADDON_VERSION') ? SYNAPSE_ADDON_VERSION : '0.9.1'),
             CURLOPT_HEADERFUNCTION => function ($handle, $headerLine) use (&$responseHeaders) {
                 $len = strlen($headerLine);
                 $parts = explode(':', $headerLine, 2);

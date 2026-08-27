@@ -7,30 +7,7 @@ if (!defined("WHMCS")) {
 }
 
 require_once __DIR__ . '/includes/SynapseClient.php';
-
-function synapseDebugEnabled() {
-    static $on = null;
-    if ($on === null) {
-        $on = Capsule::table('tbladdonmodules')
-            ->where('module', 'synapse')
-            ->where('setting', 'debug_mode')
-            ->value('value') === 'on';
-    }
-    return $on;
-}
-
-function synapseIsEnabled() {
-    static $enabled = null;
-    if ($enabled === null) {
-        $config = Capsule::table('tbladdonmodules')
-            ->where('module', 'synapse')
-            ->where('setting', 'license_key')
-            ->where('value', '!=', '')
-            ->exists();
-        $enabled = $config;
-    }
-    return $enabled;
-}
+require_once __DIR__ . '/includes/synapse_shared.php';
 
 function synapseGetDepartmentMode($department_id, $department_name) {
     $config = Capsule::table('synapse_config')
@@ -38,17 +15,24 @@ function synapseGetDepartmentMode($department_id, $department_name) {
         ->first();
     
     if ($config) {
-        return $config->enabled ? $config->ai_mode : 'observe';
+        if (!$config->enabled) {
+            return 'disabled';
+        }
+        $mode = $config->ai_mode;
+        if ($mode === 'observe') {
+            return 'copilot';
+        }
+        return $mode;
     }
     
     Capsule::table('synapse_config')->insertOrIgnore([
         'department_id' => $department_id,
         'department_name' => $department_name,
-        'ai_mode' => 'observe',
+        'ai_mode' => 'copilot',
         'enabled' => 1
     ]);
     
-    return 'observe';
+    return 'copilot';
 }
 
 function synapseEnsureQueueTable() {

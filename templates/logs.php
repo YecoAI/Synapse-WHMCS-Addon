@@ -85,7 +85,7 @@ $total_pages = ceil($total_logs / $per_page);
                             <span class="synapse-status status-<?php 
                                 echo $level === 'ERROR' ? 'error' : ($level === 'WARNING' ? 'warning' : 'healthy'); 
                             ?>">
-                                <?php echo $level; ?>
+                                <?php echo htmlspecialchars($level); ?>
                             </span>
                         </td>
                         <td>

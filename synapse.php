@@ -7,6 +7,7 @@ if (!defined("WHMCS")) {
 }
 
 require_once __DIR__ . '/includes/version.php';
+require_once __DIR__ . '/includes/synapse_shared.php';
 
 function synapse_config()
 {
@@ -91,7 +92,7 @@ function synapse_activate()
         `id` int(10) NOT NULL AUTO_INCREMENT,
         `department_id` int(10) NOT NULL,
         `department_name` varchar(255) NOT NULL,
-        `ai_mode` enum('observe','copilot','autopilot') DEFAULT 'observe',
+        `ai_mode` enum('copilot','autopilot') DEFAULT 'copilot',
         `enabled` tinyint(1) DEFAULT '1',
         `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -167,6 +168,17 @@ function synapse_upgrade($vars)
         Capsule::schema()->table('synapse_queue', function ($table) {
             $table->string('event_type', 32)->default('ingest');
         });
+    }
+
+    if (class_exists('WHMCS\\Database\\Capsule') && Capsule::schema()->hasTable('synapse_config')) {
+        try {
+            Capsule::table('synapse_config')->where('ai_mode', 'observe')->update(['ai_mode' => 'copilot']);
+        } catch (Exception $e) {
+        }
+        try {
+            full_query("ALTER TABLE `synapse_config` MODIFY `ai_mode` enum('copilot','autopilot') DEFAULT 'copilot'");
+        } catch (Exception $e) {
+        }
     }
     
     return [
